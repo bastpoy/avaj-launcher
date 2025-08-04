@@ -1,8 +1,9 @@
 package src.Aircraft;
-
 import src.Tower.WeatherTower;
 
-public interface Flyable {
-    public void updateConditions();
-    default void registerTower(WeatherTower p_tower){};
+public abstract class Flyable {
+    protected WeatherTower weatherTower;
+
+    public abstract void updateConditions();
+    public void registerTower(WeatherTower p_tower){};
 }

@@ -46,6 +46,7 @@ public class ManageInputFile {
         aircrafMap.put("Helicopter", new ArrayList<>());
         aircrafMap.put("Baloon", new ArrayList<>());
         aircrafMap.put("JetPlane", new ArrayList<>());
+        List<List<String>> aircraftFinalList = new ArrayList<>(); 
 
         String[] lines = fileContent.toString().split("\n");
         
