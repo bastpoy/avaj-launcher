@@ -2,7 +2,7 @@ package src;
 
 import java.io.IOException;
 
-import src.Exception.MyException;
+import src.Exception.FileError;
 import src.File.ManageInputFile;
 
 class Main {
@@ -10,25 +10,27 @@ class Main {
         System.out.println("Cobra 17 a Dela Charlie Weather Station " + args.length);
         try{
             if(args.length < 1){
-                throw new MyException.ErrorNoArgument();
+                throw new FileError.ErrorNoArgument();
             }
             else if(args.length > 1){
-                throw new MyException.ErrorTooManyArgument();
+                throw new FileError.ErrorTooManyArgument();
             }
 
             StringBuffer fileText = ManageInputFile.readFile(args[0]);
             if(fileText.isEmpty()){
-                throw new MyException.FileEmpty(args[0]);
+                throw new FileError.FileEmpty(args[0]);
             }
             ManageInputFile.parseFile(fileText);
 
 
-        }catch(MyException.ErrorNoArgument | 
-            MyException.ErrorTooManyArgument e){
+        }catch(FileError.ErrorNoArgument | 
+            FileError.ErrorTooManyArgument e){
             System.err.println("Error Arguments " + e);
-        }catch(MyException.FileNotFound |
-                MyException.FileEmpty e){
+        }catch(FileError.FileNotFound |
+                FileError.FileEmpty e){
             System.err.println("Error File " + e);
+        }catch(UnsupportedOperationException e){
+            System.err.println(e);
         }
     }
 }

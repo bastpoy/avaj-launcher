@@ -4,14 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import src.Aircraft.Aircraft;
-import src.Exception.MyException;
+import src.Exception.FileError;
+import src.Exception.ValidationError;
 
 public class ManageInputFile {
     private static final Set<String> VALID_TYPES = Set.of("Helicopter", "Baloon", "JetPlane");
@@ -21,10 +17,10 @@ public class ManageInputFile {
         'J', "JetPlane"
     );
     
-    public static StringBuffer readFile(String fileName) throws IOException, MyException.FileNotFound{
+    public static StringBuffer readFile(String fileName) throws IOException, FileError.FileNotFound{
         File file = new File(fileName);
         if (!file.exists()) {
-            throw new MyException.FileNotFound(fileName);
+            throw new FileError.FileNotFound(fileName);
         }
         try(
             FileReader fr = new FileReader(file);
@@ -46,115 +42,109 @@ public class ManageInputFile {
     }
     
     public static void parseFile(StringBuffer fileContent){
-        Set<String> usedNumbers = new HashSet<>(); // Track used numbers across all types
-        
+        Map<String, List<Integer>> aircrafMap = new HashMap<>();
+        aircrafMap.put("Helicopter", new ArrayList<>());
+        aircrafMap.put("Baloon", new ArrayList<>());
+        aircrafMap.put("JetPlane", new ArrayList<>());
+
         String[] lines = fileContent.toString().split("\n");
         
-        // Skip first line (should be the count)
         if (lines.length < 2) {
-            // throw new ValidationException("File must contain at least a count line and one data line");
+            throw new ValidationError.LineLength();
         }
         
         int expectedCount;
         try {
             expectedCount = Integer.parseInt(lines[0].trim());
         } catch (NumberFormatException e) {
-            // throw new ValidationException("First line must be a valid number indicating count of records");
+            throw new ValidationError.IntegerConvertion();
         }
+        System.out.println(expectedCount);
         
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i].trim();
+            System.out.println(line);
             if (line.isEmpty()) continue;
-            
-            try {
-                parseLine(line, usedNumbers, i);
-            } catch (ValidationException e) {
-                // throw new ValidationException("Line " + i + ": " + e.getMessage());
-            }
+            parseLine(line, aircrafMap, i);
         }
-        
     }
     
-    private static void parseLine(String line, Set<String> usedNumbers, int lineNumber){
+    private static void parseLine(String line,
+                          Map<String, List<Integer>> aircrafMap, int lineNumber){
         String[] parts = line.split("\\s");
         
-        // Check if all 5 attributes are present
         if (parts.length != 5) {
-            // throw new ValidationException("Each line must have exactly 5 attributes (TYPE NAME LONGITUDE LATITUDE HEIGHT), found " + parts.length);
+            throw new ValidationError("Each line must have exactly 5 attributes (TYPE NAME LONGITUDE LATITUDE HEIGHT), found " + parts.length);
         }
         
         // Validate TYPE
         String type = parts[0];
         if (!VALID_TYPES.contains(type)) {
-            // throw new ValidationException("Invalid type '" + type + "'. Must be one of: Helicopter, Baloon, JetPlane");
+            throw new ValidationError("Invalid type '" + type + "'. Must be one of: Helicopter, Baloon, JetPlane");
         }
         
         // Validate NAME
         String name = parts[1];
-        if (!isValidName(name, type, usedNumbers)) {
-            // throw new ValidationException("Invalid name '" + name + "'. Must be first letter of type + number, and number must be unique across all types");
+        Optional <String> returnMessage = isValidName(name, type, aircrafMap);
+        if (returnMessage.isPresent()) {
+            throw new ValidationError(returnMessage.toString());
         }
         
         // Parse and validate LONGITUDE
-        double longitude;
-        try {
-            longitude = Double.parseDouble(parts[2]);
-            if (longitude < -180 || longitude > 180) {
-                // throw new ValidationException("Longitude must be between -180 and 180, found: " + longitude);
-            }
-        } catch (NumberFormatException e) {
-            // throw new ValidationException("Invalid longitude format: " + parts[2]);
+        double longitude = Double.parseDouble(parts[2]);
+        if (longitude < -180 || longitude > 180) {
+            throw new ValidationError("Longitude must be between -180 and 180, found: " + longitude);
         }
         
         // Parse and validate LATITUDE
-        double latitude;
-        try {
-            latitude = Double.parseDouble(parts[3]);
-            if (latitude < -90 || latitude > 90) {
-                // throw new ValidationException("Latitude must be between -90 and 90, found: " + latitude);
-            }
-        } catch (NumberFormatException e) {
-            // throw new ValidationException("Invalid latitude format: " + parts[3]);
+        double latitude = Double.parseDouble(parts[3]);
+        if (latitude < -90 || latitude > 90) {
+            throw new ValidationError("Latitude must be between -90 and 90, found: " + latitude);
         }
-        
+
         // Parse and validate HEIGHT
-        int height;
-        try {
-            height = Integer.parseInt(parts[4]);
-            if (height <= 0 || height > 100) {
-                // throw new ValidationException("Height must be between 0 and 100, found: " + height);
-            }
-        } catch (NumberFormatException e) {
-            // throw new ValidationException("Invalid height format: " + parts[4]);
+        int height = Integer.parseInt(parts[4]);
+        if (height <= 0 || height > 100) {
+            throw new ValidationError("Height must be between 0 and 100, found: " + height);
         }
     }
     
-    private static boolean isValidName(String name, String type, Set<String> usedNumbers) {
-        if (name.length() < 2) return false;
+    private static Optional<String> isValidName(String name, String type,
+                        Map<String, List<Integer>> aircrafMap) {
         
+        //VALIDATE CODE TYPE
+        if (name.length() != 2)
+            return Optional.of("Error code Type doesnt contain two words");
+
+        //VALIDATE FIRST CHAR OF CODE TYPE
         char firstChar = name.charAt(0);
         String expectedType = TYPE_PREFIXES.get(firstChar);
+        if (!type.equals(expectedType)) 
+            return Optional.of("Error type Aicraft doesnt correspond to a type");
         
-        // Check if first character matches the type
-        if (!type.equals(expectedType)) {
-            return false;
-        }
-        
-        // Extract number part
+        //VALIDATE NUMBER CODE TYPE
         String numberPart = name.substring(1);
+        int codeNumber;
         try {
-            Integer.parseInt(numberPart); // Validate it's a number
+            codeNumber = Integer.parseInt(numberPart);
         } catch (NumberFormatException e) {
-            return false;
+            return Optional.of("Error number part isn't an integer");
         }
         
-        // Check if number is already used
-        if (usedNumbers.contains(numberPart)) {
-            return false;
+        //VALIDATE IF DUPLICATE NUMBER CODE TYPE
+        List<Integer> numberTypeAicraft = aircrafMap.get(type);
+        if(numberTypeAicraft == null)
+            return Optional.of("Can't get aircraft type");
+        if(numberTypeAicraft.contains(codeNumber))
+            return Optional.of("Duplicate code number for type " + type);
+
+        //ADD NEZ NUMEBR CODE TYPE
+        try{
+            numberTypeAicraft.add(codeNumber);
+        }catch(UnsupportedOperationException e){
+            return Optional.of("Error adding number to aircreaft list");
         }
-        
-        // Add to used numbers
-        usedNumbers.add(numberPart);
-        return true;
+
+        return Optional.empty();
     }
 }
