@@ -3,15 +3,22 @@ package src.Aircraft;
 public class Helicopter extends Aircraft{
     Helicopter(long p_id, String p_name, Coordinates p_coordinate){
         super(p_id, p_name, p_coordinate);
-        System.out.println("Helicopter constructor");
+        // System.out.println(ANSI_BLUE + "Helicopter constructor" + ANSI_RESET);
     }
     
     public void updateConditions(){
         String weather = weatherTower.getWeather(coordinates);
-        
+        weatherTower.setNewWeather(weather);
+
+        if(weather != weatherTower.getoldWeather()){
+            weatherTower.changeWeather();
+        }
+
         if(weather == "SUN"){
             coordinates.setLongitude(coordinates.getLongitude() + 10);
             coordinates.setHeight(coordinates.getHeight() + 2);
+            if(coordinates.getHeight() > 100)
+                coordinates.setHeight(100);
         }else if(weather == "RAIN"){
             coordinates.setLongitude(coordinates.getLongitude() + 5);
         }else if (weather == "FOG"){
@@ -19,5 +26,6 @@ public class Helicopter extends Aircraft{
         }else{
             coordinates.setHeight(coordinates.getHeight() - 12);
         }
+        this.printMessage(weather);
     };
 }

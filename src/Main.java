@@ -1,9 +1,13 @@
 package src;
 
 import java.io.IOException;
+import java.util.*;
 
+import src.Aircraft.Flyable;
 import src.Exception.FileError;
+import src.Exception.ValidationError;
 import src.File.ManageInputFile;
+import src.Tower.*;
 
 class Main {
     public static void main( String [] args ) throws IOException{
@@ -20,8 +24,19 @@ class Main {
             if(fileText.isEmpty()){
                 throw new FileError.FileEmpty(args[0]);
             }
-            ManageInputFile.parseFile(fileText);
+            
+            WeatherTower tower = ManageInputFile.parseFile(fileText);
+            List<Flyable> flyables = tower.getObservers();
 
+            for(Flyable flyable : flyables){
+                flyable.updateConditions();
+                if(flyable.getHeight() <= 0){
+                    tower.unregister(flyable);
+                }
+                if(tower.getSimulationNumber() <= 0){
+                    break;
+                }
+            }
 
         }catch(FileError.ErrorNoArgument | 
             FileError.ErrorTooManyArgument e){
@@ -30,6 +45,10 @@ class Main {
                 FileError.FileEmpty e){
             System.err.println("Error File " + e);
         }catch(UnsupportedOperationException e){
+            System.err.println(e);
+        }catch (NumberFormatException e) {
+            System.err.println(e);
+        }catch(ValidationError e){
             System.err.println(e);
         }
     }

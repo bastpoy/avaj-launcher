@@ -7,11 +7,15 @@ import java.util.Random;
 import src.Aircraft.Coordinates;
 
 public class WeatherProvider {
-    private String weather;
+    private static final String[] weather = {"SUN", "RAIN", "FOG", "SNOW"};
+    private static final WeatherProvider weatherProvider = new WeatherProvider();
 
-    private WeatherProvider(){};
 
-    public static String generateWeather(Coordinates p_coordinates) {
+    public static WeatherProvider singleton(){
+        return weatherProvider;
+    }
+
+    public String getCurrentWeather(Coordinates p_coordinates) {
     // public static String generateWeather(int longitude, int latitude, int height){
         int longitude = p_coordinates.getLongitude();
         int latitude = p_coordinates.getLatitude();
@@ -38,16 +42,16 @@ public class WeatherProvider {
         
         // Decision logic with thresholds
         if (heightFactor > 0.7 && moistureFactor > 0.6) {
-            return "FOG"; // High altitude + moisture = fog
+            return weather[2]; // High altitude + moisture = fog
         }
         
         if (coldFactor > 0.6 && moistureFactor > 0.5) {
-            return "SNOW"; // Cold + moisture = snow
+            return weather[3]; // Cold + moisture = snow
         }
         
         if (moistureFactor > 0.7 && coldFactor < 0.5) {
-            return "RAIN"; // High moisture + not too cold = rain
+            return weather[1]; // High moisture + not too cold = rain
         }
-        return "SUN";
+        return weather[0];
     }
 }

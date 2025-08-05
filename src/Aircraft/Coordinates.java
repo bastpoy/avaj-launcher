@@ -1,13 +1,13 @@
 package src.Aircraft;
 
 public class Coordinates {
-    private int latitude;
     private int longitude;
+    private int latitude;
     private int height;
 
-    public Coordinates(int p_latitude, int p_longitude, int p_height){
-        this.latitude = p_latitude;
+    public Coordinates(int p_longitude, int p_latitude, int p_height){
         this.longitude = p_longitude;
+        this.latitude = p_latitude;
         this.height = p_height;
     }
     

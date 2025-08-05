@@ -1,17 +1,20 @@
 package src.File;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+import src.Aircraft.*;
+import src.Tower.*;
 import src.Exception.FileError;
 import src.Exception.ValidationError;
 
 public class ManageInputFile {
     private static final Set<String> VALID_TYPES = Set.of("Helicopter", "Baloon", "JetPlane");
-    private static final Map<Character, String> TYPE_PREFIXES = Map.of(
+    public static final Map<Character, String> TYPE_PREFIXES = Map.of(
         'H', "Helicopter",
         'B', "Baloon", 
         'J', "JetPlane"
@@ -41,12 +44,11 @@ public class ManageInputFile {
         return new StringBuffer();
     }
     
-    public static void parseFile(StringBuffer fileContent){
+    public static WeatherTower parseFile(StringBuffer fileContent){
         Map<String, List<Integer>> aircrafMap = new HashMap<>();
         aircrafMap.put("Helicopter", new ArrayList<>());
         aircrafMap.put("Baloon", new ArrayList<>());
         aircrafMap.put("JetPlane", new ArrayList<>());
-        List<List<String>> aircraftFinalList = new ArrayList<>(); 
 
         String[] lines = fileContent.toString().split("\n");
         
@@ -54,23 +56,25 @@ public class ManageInputFile {
             throw new ValidationError.LineLength();
         }
         
-        int expectedCount;
-        try {
-            expectedCount = Integer.parseInt(lines[0].trim());
-        } catch (NumberFormatException e) {
-            throw new ValidationError.IntegerConvertion();
-        }
-        System.out.println(expectedCount);
-        
+        int simulationNumber = Integer.parseInt(lines[0].trim());
+        if(simulationNumber < 0){
+            throw new ValidationError("Number of simulation can't be negative");
+        }        
+        WeatherTower tower = new WeatherTower(simulationNumber);
+
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i].trim();
-            System.out.println(line);
+            // System.out.println(line);
             if (line.isEmpty()) continue;
-            parseLine(line, aircrafMap, i);
+            Flyable flyable = parseLine(line, aircrafMap, i);
+            if(flyable.getHeight() > 0)
+                tower.register(flyable);
+            flyable.registerTower(tower);
         }
+        return (tower);
     }
     
-    private static void parseLine(String line,
+    private static Flyable parseLine(String line,
                           Map<String, List<Integer>> aircrafMap, int lineNumber){
         String[] parts = line.split("\\s");
         
@@ -92,22 +96,27 @@ public class ManageInputFile {
         }
         
         // Parse and validate LONGITUDE
-        double longitude = Double.parseDouble(parts[2]);
+        int longitude = Integer.parseInt(parts[2]);
         if (longitude < -180 || longitude > 180) {
             throw new ValidationError("Longitude must be between -180 and 180, found: " + longitude);
         }
         
         // Parse and validate LATITUDE
-        double latitude = Double.parseDouble(parts[3]);
+        int latitude = Integer.parseInt(parts[3]);
         if (latitude < -90 || latitude > 90) {
             throw new ValidationError("Latitude must be between -90 and 90, found: " + latitude);
         }
 
         // Parse and validate HEIGHT
         int height = Integer.parseInt(parts[4]);
-        if (height <= 0 || height > 100) {
+        if (height < 0) {
             throw new ValidationError("Height must be between 0 and 100, found: " + height);
         }
+        if (height > 100)
+            height = 100;
+        Coordinates coord = new Coordinates(longitude, latitude, height);
+        Flyable flyable = AircraftFactory.singleton().newAircraft(type, name, coord);
+        return (flyable);
     }
     
     private static Optional<String> isValidName(String name, String type,
@@ -148,4 +157,5 @@ public class ManageInputFile {
 
         return Optional.empty();
     }
+
 }

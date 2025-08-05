@@ -5,5 +5,10 @@ public abstract class Flyable {
     protected WeatherTower weatherTower;
 
     public abstract void updateConditions();
-    public void registerTower(WeatherTower p_tower){};
+    public abstract String getName();
+    public abstract Coordinates getCoordinates();
+    public abstract int getHeight();
+    public void registerTower(WeatherTower p_tower){
+        weatherTower = p_tower;
+    };
 }
