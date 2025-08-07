@@ -14,7 +14,6 @@ public class WeatherTower extends Tower {
     };
 
     public void changeWeather(){
-        oldWeather = newWeather;
         this.conditionChanged();
     }
 }

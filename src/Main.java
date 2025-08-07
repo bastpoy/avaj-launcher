@@ -1,9 +1,7 @@
 package src;
 
 import java.io.IOException;
-import java.util.*;
 
-import src.Aircraft.Flyable;
 import src.Exception.FileError;
 import src.Exception.ValidationError;
 import src.File.ManageInputFile;
@@ -26,16 +24,9 @@ class Main {
             }
             
             WeatherTower tower = ManageInputFile.parseFile(fileText);
-            List<Flyable> flyables = tower.getObservers();
 
-            for(Flyable flyable : flyables){
-                flyable.updateConditions();
-                if(flyable.getHeight() <= 0){
-                    tower.unregister(flyable);
-                }
-                if(tower.getSimulationNumber() <= 0){
-                    break;
-                }
+            for(int i = 0; i < tower.getSimulationNumber(); i++){
+                tower.changeWeather();
             }
 
         }catch(FileError.ErrorNoArgument | 

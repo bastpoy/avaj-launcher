@@ -6,15 +6,11 @@ import src.Aircraft.Flyable;
 
 public class Tower {
     private List<Flyable> observers;
-    protected int simulationNumber;
-    protected String oldWeather;
-    protected String newWeather;
+    private final int simulationNumber;
 
     Tower(int p_simulationNumber){
         observers = new ArrayList<Flyable>();
         simulationNumber = p_simulationNumber;
-        oldWeather = "";
-        newWeather = "";
     };
 
     public void register(Flyable p_flyable){
@@ -25,12 +21,16 @@ public class Tower {
         observers.remove(p_flyable);
         System.out.println(p_flyable.getName() + " unregister from the tower");
     };
-    public String getoldWeather(){return oldWeather;}
     public List<Flyable> getObservers(){return observers;}
-    public void setNewWeather(String weather){newWeather = weather;}
     public int getSimulationNumber(){return simulationNumber;}
     
     protected void conditionChanged(){
-        simulationNumber--;
+        for(int i = 0; i < observers.size(); i++){
+            Flyable observer = observers.get(i);
+            observer.updateConditions();
+            if(observer.getHeight() <= 0){
+                this.unregister(observer);
+            }
+        }
     };
 }

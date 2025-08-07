@@ -43,4 +43,22 @@ abstract class Aircraft extends Flyable{
             ")" + ": " + type + " a froid");
         }
     }
+
+    protected void verifyCoordinates(){
+        if(coordinates.getLongitude() > 180){
+            coordinates.setLongitude(-360 + coordinates.getLongitude());
+        }
+        else if(coordinates.getLongitude() < -180){
+            coordinates.setLongitude(360 + coordinates.getLongitude());
+        }
+        if(coordinates.getLatitude() > 90){
+            coordinates.setLatitude(180 - coordinates.getLatitude());
+        }
+        else if(coordinates.getLatitude() < - 90){
+            coordinates.setLatitude(-180 + coordinates.getLatitude());
+        }
+        if(coordinates.getHeight() > 100){
+            coordinates.setHeight(100);
+        }
+    }
 }

@@ -8,11 +8,6 @@ public class Helicopter extends Aircraft{
     
     public void updateConditions(){
         String weather = weatherTower.getWeather(coordinates);
-        weatherTower.setNewWeather(weather);
-
-        if(weather != weatherTower.getoldWeather()){
-            weatherTower.changeWeather();
-        }
 
         if(weather == "SUN"){
             coordinates.setLongitude(coordinates.getLongitude() + 10);
@@ -27,5 +22,6 @@ public class Helicopter extends Aircraft{
             coordinates.setHeight(coordinates.getHeight() - 12);
         }
         this.printMessage(weather);
+        this.verifyCoordinates();
     };
 }

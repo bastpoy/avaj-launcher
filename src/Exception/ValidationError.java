@@ -1,6 +1,7 @@
 package src.Exception;
 
 public class ValidationError extends RuntimeException{
+    
     public ValidationError(String errorMessage){
         super("Error parsing Validation: " + errorMessage);
     }

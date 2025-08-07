@@ -8,17 +8,10 @@ public class Baloon extends Aircraft{
 
     public void updateConditions(){
         String weather = weatherTower.getWeather(coordinates);
-        weatherTower.setNewWeather(weather);
-
-        if(weather != weatherTower.getoldWeather()){
-            weatherTower.changeWeather();
-        }
         
         if(weather == "SUN"){
             coordinates.setLongitude(coordinates.getLongitude() + 2);
             coordinates.setHeight(coordinates.getHeight() + 4);
-            if(coordinates.getHeight() > 100)
-                coordinates.setHeight(100);
         }else if(weather == "RAIN"){
             coordinates.setHeight(coordinates.getHeight() - 5);
         }else if (weather == "FOG"){
@@ -27,5 +20,6 @@ public class Baloon extends Aircraft{
             coordinates.setHeight(coordinates.getHeight() - 15);
         }
         this.printMessage(weather);
+        this.verifyCoordinates();
     };
 }

@@ -8,17 +8,10 @@ public class JetPlane extends Aircraft{
 
     public void updateConditions(){
         String weather = weatherTower.getWeather(coordinates);
-        weatherTower.setNewWeather(weather);
-
-        if(weather != weatherTower.getoldWeather()){
-            weatherTower.changeWeather();
-        }
         
         if(weather == "SUN"){
             coordinates.setLatitude(coordinates.getLatitude() + 10);
             coordinates.setHeight(coordinates.getHeight() + 2);
-            if(coordinates.getHeight() > 100)
-                coordinates.setHeight(100);
         }else if(weather == "RAIN"){
             coordinates.setLatitude(coordinates.getLatitude() + 5);
         }else if (weather == "FOG"){
@@ -27,5 +20,6 @@ public class JetPlane extends Aircraft{
             coordinates.setHeight(coordinates.getHeight() - 7);
         }
         this.printMessage(weather);
+        this.verifyCoordinates();
     };
 }
