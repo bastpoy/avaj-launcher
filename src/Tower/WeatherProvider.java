@@ -3,7 +3,7 @@ import src.Aircraft.Coordinates;
 
 public class WeatherProvider {
     private static final WeatherProvider weatherProvider = new WeatherProvider();
-
+    private WeatherProvider(){};
     public static WeatherProvider singleton(){
         return weatherProvider;
     }
@@ -24,15 +24,15 @@ public class WeatherProvider {
                            (1 - normalizedLat) * 0.3 + 
                            normalizedHeight * 0.2;
     
-    if (normalizedHeight > 0.7 && moistureFactor > 0.6) {
+    if (normalizedHeight > 0.75 && moistureFactor > 0.65) {
         return "FOG";
     }
     
-    if (temperatureFactor > 0.6 && moistureFactor > 0.4) {
+    if (temperatureFactor > 0.55 && moistureFactor > 0.35) {
         return "SNOW";
     }
     
-    if (temperatureFactor < 0.5 && moistureFactor > 0.65) {
+    if (temperatureFactor < 0.4 && moistureFactor > 0.7) {
         return "RAIN";
     }
     
