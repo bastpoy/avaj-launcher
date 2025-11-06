@@ -44,7 +44,7 @@ public class ManageInputFile {
         return new StringBuffer();
     }
     
-    public static WeatherTower parseFile(StringBuffer fileContent){
+    public static WeatherTower parseFile(StringBuffer fileContent, List<Flyable> flyableArray) {
         Map<String, List<Integer>> aircrafMap = new HashMap<>();
         aircrafMap.put("Helicopter", new ArrayList<>());
         aircrafMap.put("Baloon", new ArrayList<>());
@@ -67,9 +67,7 @@ public class ManageInputFile {
             // System.out.println(line);
             if (line.isEmpty()) continue;
             Flyable flyable = parseLine(line, aircrafMap, i);
-            if(flyable.getHeight() > 0)
-                tower.register(flyable);
-            flyable.registerTower(tower);
+            flyableArray.add(flyable);
         }
         return (tower);
     }
@@ -97,15 +95,9 @@ public class ManageInputFile {
         
         // Parse and validate LONGITUDE
         int longitude = Integer.parseInt(parts[2]);
-        if (longitude < -180 || longitude > 180) {
-            throw new ValidationError("Longitude must be between -180 and 180, found: " + longitude);
-        }
         
         // Parse and validate LATITUDE
         int latitude = Integer.parseInt(parts[3]);
-        if (latitude < -90 || latitude > 90) {
-            throw new ValidationError("Latitude must be between -90 and 90, found: " + latitude);
-        }
 
         // Parse and validate HEIGHT
         int height = Integer.parseInt(parts[4]);
@@ -121,7 +113,6 @@ public class ManageInputFile {
     
     private static Optional<String> isValidName(String name, String type,
                         Map<String, List<Integer>> aircrafMap) {
-        
         //VALIDATE CODE TYPE
         if (name.length() != 2)
             return Optional.of("Error code Type doesnt contain two words");

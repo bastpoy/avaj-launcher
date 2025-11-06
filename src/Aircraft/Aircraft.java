@@ -25,38 +25,27 @@ abstract class Aircraft extends Flyable{
     }
     public String getName(){ return name;}
     public Coordinates getCoordinates(){return coordinates;}
+    public long getId(){return id;}
     public int getHeight(){return coordinates.getHeight();}
     public void printMessage(String weather){
         String type = ManageInputFile.TYPE_PREFIXES.get(name.charAt(0));
 
         if(weather == "SUN"){
             System.out.println(type + "#" + this.name + "(" + this.id + 
-            ")" + ": " + type + " a chaud");
+            ")" + ": " + type + " is hot");
         }else if(weather == "RAIN"){
             System.out.println(type + "#" + this.name + "(" + this.id + 
-            ")" + ": " + type + " est mouillé");
+            ")" + ": " + type + " is wet");
         }else if (weather == "FOG"){
             System.out.println(type + "#" + this.name + "(" + this.id + 
-            ")" + ": " + type + " voit rien");
+            ")" + ": " + type + " see nothing");
         }else{
             System.out.println(type + "#" + this.name + "(" + this.id + 
-            ")" + ": " + type + " a froid");
+            ")" + ": " + type + " is cold");
         }
     }
 
     protected void verifyCoordinates(){
-        if(coordinates.getLongitude() > 180){
-            coordinates.setLongitude(-360 + coordinates.getLongitude());
-        }
-        else if(coordinates.getLongitude() < -180){
-            coordinates.setLongitude(360 + coordinates.getLongitude());
-        }
-        if(coordinates.getLatitude() > 90){
-            coordinates.setLatitude(180 - coordinates.getLatitude());
-        }
-        else if(coordinates.getLatitude() < - 90){
-            coordinates.setLatitude(-180 + coordinates.getLatitude());
-        }
         if(coordinates.getHeight() > 100){
             coordinates.setHeight(100);
         }

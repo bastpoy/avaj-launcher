@@ -9,34 +9,33 @@ public class WeatherProvider {
     }
 
     public String getCurrentWeather(Coordinates p_coordinates) {
-        int longitude = p_coordinates.getLongitude();
-        int latitude = p_coordinates.getLatitude();
-        int height = p_coordinates.getHeight();
-
-        double baseValue = Math.sin(Math.toRadians(latitude * 2)) + 
-                          Math.cos(Math.toRadians(longitude * 1.5));
-        
-        baseValue = (baseValue + 2) / 4.0;
-        
-        double heightFactor = height / 100.0;
-        
-        double coldFactor = heightFactor + (1 - Math.abs(latitude) / 90.0) * 0.3;
-        double moistureFactor = baseValue + heightFactor * 0.2;
-        
-        double continentalFactor = Math.abs(Math.sin(Math.toRadians(longitude * 3)));
-        moistureFactor += continentalFactor * 0.2;
-        
-        if (heightFactor > 0.7 && moistureFactor > 0.6) {
-            return "FOG"; 
-        }
-        
-        if (coldFactor > 0.6 && moistureFactor > 0.5) {
-            return "SNOW";
-        }
-        
-        if (moistureFactor > 0.7 && coldFactor < 0.5) {
-            return "RAIN";
-        }
-        return "SUN";
+    int longitude = p_coordinates.getLongitude() % 90;
+    int latitude = p_coordinates.getLatitude() % 90;
+    int height = p_coordinates.getHeight();
+    
+    double normalizedLat = Math.abs(latitude) / 90.0;
+    double normalizedHeight = height / 100.0;
+    
+    double longitudeVariation = (Math.sin(Math.toRadians(longitude * 2.7)) + 1) / 2.0;
+    
+    double temperatureFactor = normalizedLat * 0.6 + normalizedHeight * 0.4;
+    
+    double moistureFactor = longitudeVariation * 0.5 + 
+                           (1 - normalizedLat) * 0.3 + 
+                           normalizedHeight * 0.2;
+    
+    if (normalizedHeight > 0.7 && moistureFactor > 0.6) {
+        return "FOG";
+    }
+    
+    if (temperatureFactor > 0.6 && moistureFactor > 0.4) {
+        return "SNOW";
+    }
+    
+    if (temperatureFactor < 0.5 && moistureFactor > 0.65) {
+        return "RAIN";
+    }
+    
+    return "SUN";
     }
 }

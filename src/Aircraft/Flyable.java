@@ -8,6 +8,7 @@ public abstract class Flyable {
     public abstract String getName();
     public abstract Coordinates getCoordinates();
     public abstract int getHeight();
+    public abstract long getId();
     public void registerTower(WeatherTower p_tower){
         weatherTower = p_tower;
     };
